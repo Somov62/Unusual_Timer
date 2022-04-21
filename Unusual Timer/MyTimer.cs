@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Threading;
+using System.Timers;
 
 namespace Unusual_Timer
 {
-    public class Timer
+    public class MyTimer
     {
         private int _countUnitsInRow;
         private List<TimerUnit> _listTimerUnits;
         private TimerUnit[,] _units;
         private bool _isEnabled;
         private TimeSpan _duration;
-        private DispatcherTimer _timer;
+        private Timer _timer;
 
-        public Timer()
+        public MyTimer()
         {
             CountUnitsInRow = 5;
         }
@@ -32,10 +32,10 @@ namespace Unusual_Timer
             }
         }
 
-        public List<TimerUnit> ListTimerUnits 
-        { 
-            get => _listTimerUnits; 
-            private set => _listTimerUnits = value; 
+        public List<TimerUnit> ListTimerUnits
+        {
+            get => _listTimerUnits;
+            private set => _listTimerUnits = value;
         }
         public TimeSpan Duration
         {
@@ -54,50 +54,43 @@ namespace Unusual_Timer
                 throw new Exception();
             }
             Task.Run(StartTimer);
-            
         }
         private double progress;
         private double millisecondIncrease;
         private double unitDuration;
-        public void Timer_Tick(object sender, EventArgs e)
-        {
-            if (progress >= Duration.TotalMilliseconds) this.Stop();
-            progress += _timer.Interval.TotalMilliseconds;
-            for (int j = _units.GetLength(1) - 1; j > -1; j--)
-            {
-                if (_units[0, j].Time > 0)
-                {
-                    try
-                    {
-                        _units[0, j].Time -= unitDuration / (millisecondIncrease * _timer.Interval.TotalMilliseconds);
-                    }
-                    catch 
-                    {
-                    }
-                    break;
-                }
-            }
 
-        }
         private void StartTimer()
         {
-            unitDuration = Duration.TotalMilliseconds / CountUnitsInRow * 2 - 1;
+            unitDuration = Duration.TotalMilliseconds / (CountUnitsInRow * 2 - 1);
             millisecondIncrease = 1 / unitDuration;
 
             _isEnabled = true;
-            _timer = new DispatcherTimer();
-            _timer.Interval = new TimeSpan(0, 0, 0, 0, 5);
-            _timer.Tick += (object sender, EventArgs e) => 
+            _timer = new Timer();
+            _timer.Interval = 100;
+            _timer.Elapsed += _timer_Elapsed;
+            _timer.Start();
+        }
+
+        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (progress >= Duration.TotalMilliseconds) this.Stop();
+            progress += _timer.Interval;
+            if (_units[0, 0].Time > 0)
             {
-                if (progress >= Duration.TotalMilliseconds) this.Stop();
-                progress += _timer.Interval.TotalMilliseconds;
+
                 for (int j = _units.GetLength(1) - 1; j > -1; j--)
                 {
                     if (_units[0, j].Time > 0)
                     {
                         try
                         {
-                            _units[0, j].Time -= unitDuration / (millisecondIncrease * _timer.Interval.TotalMilliseconds);
+                            int j1 = j;
+                            for (int i = j; i < _units.GetLength(0); i++)
+                            {
+                                _units[i, j1].Time -= millisecondIncrease * _timer.Interval;
+                                if (_units[i, j1].Time < 0) _units[i, j1].Time = 0;
+                                j1++;
+                            }
                         }
                         catch
                         {
@@ -105,10 +98,31 @@ namespace Unusual_Timer
                         break;
                     }
                 }
-            };
-            _timer.IsEnabled = true;
-            _timer.Start();
+                return;
+            }
+
+            for (int i = 1; i < _units.GetLength(0); i++)
+            {
+                if (_units[i, 0].Time > 0)
+                {
+                    try
+                    {
+                        int i1 = i;
+                        for (int j = i; i < _units.GetLength(0); j++)
+                        {
+                            _units[i1, j].Time -= millisecondIncrease * _timer.Interval;
+                            if (_units[i1, j].Time < 0) _units[i1, j].Time = 0;
+                            i1++;
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    break;
+                }
+            }
         }
+
         public void Stop()
         {
             if (!_isEnabled) return;
