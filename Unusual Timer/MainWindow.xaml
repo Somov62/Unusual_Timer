@@ -58,7 +58,11 @@
                                 </Border.Effect>
                             </Border>
                             <Border Background="LawnGreen" Panel.ZIndex="-1" Grid.Row="2">
-                                <TextBlock Text="{Binding ElementName=h1, Path=Height}"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding ElementName=h1, Path=Height}"/>
+                                    <TextBlock Text="{Binding IsEnabled}"/>
+                                    
+                                </StackPanel>
                             </Border>
                         </Grid>
                     </Grid>

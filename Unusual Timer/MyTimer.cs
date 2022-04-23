@@ -10,7 +10,6 @@ namespace Unusual_Timer
     public class MyTimer
     {
         private int _countUnitsInRow;
-        private List<TimerUnit> _listTimerUnits;
         private TimerUnit[,] _units;
         private bool _isEnabled;
         private TimeSpan _duration;
@@ -32,11 +31,8 @@ namespace Unusual_Timer
             }
         }
 
-        public List<TimerUnit> ListTimerUnits
-        {
-            get => _listTimerUnits;
-            private set => _listTimerUnits = value;
-        }
+        public List<TimerUnit> ListTimerUnits { get; private set; }
+
         public TimeSpan Duration
         {
             get => _duration;
@@ -56,70 +52,62 @@ namespace Unusual_Timer
             Task.Run(StartTimer);
         }
         private double progress;
-        private double millisecondIncrease;
         private double unitDuration;
 
         private void StartTimer()
         {
             unitDuration = Duration.TotalMilliseconds / (CountUnitsInRow * 2 - 1);
-            millisecondIncrease = 1 / unitDuration;
 
             _isEnabled = true;
             _timer = new Timer();
-            _timer.Interval = 100;
-            _timer.Elapsed += _timer_Elapsed;
+            _timer.Interval = 1;
+            _timer.Elapsed += Timer_Elapsed;
             _timer.Start();
         }
 
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (progress >= Duration.TotalMilliseconds) this.Stop();
+            _timer.Interval = unitDuration + 500;
+            if (progress >= Duration.TotalMilliseconds)
+            {
+                this.Stop();
+                return;
+            }
             progress += _timer.Interval;
             if (_units[0, 0].Time > 0)
             {
-
-                for (int j = _units.GetLength(1) - 1; j > -1; j--)
+                for (int j = _units.GetLength(1) - 1; j >= 0; j--)
                 {
-                    if (_units[0, j].Time > 0)
+                    if (_units[0, j].Time == 0) continue;
+
+                    try
                     {
-                        try
+                        for (int i = 0; i < _units.Length; i++)
                         {
-                            int j1 = j;
-                            for (int i = j; i < _units.GetLength(0); i++)
-                            {
-                                _units[i, j1].Time -= millisecondIncrease * _timer.Interval;
-                                if (_units[i, j1].Time < 0) _units[i, j1].Time = 0;
-                                j1++;
-                            }
+                            _units[i, j + i].Duration = unitDuration;
+                            _units[i, j + i].Start();
                         }
-                        catch
-                        {
-                        }
-                        break;
                     }
+                    catch { }
+                    break;
                 }
                 return;
             }
 
             for (int i = 1; i < _units.GetLength(0); i++)
             {
-                if (_units[i, 0].Time > 0)
+                if (_units[i, 0].Time == 0) continue;
+
+                try
                 {
-                    try
+                    for (int j = 0; j < _units.Length; j++)
                     {
-                        int i1 = i;
-                        for (int j = i; i < _units.GetLength(0); j++)
-                        {
-                            _units[i1, j].Time -= millisecondIncrease * _timer.Interval;
-                            if (_units[i1, j].Time < 0) _units[i1, j].Time = 0;
-                            i1++;
-                        }
+                        _units[i + j, j].Duration = unitDuration;
+                        _units[i + j, j].Start();
                     }
-                    catch
-                    {
-                    }
-                    break;
                 }
+                catch { }
+                break;
             }
         }
 
