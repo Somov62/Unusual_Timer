@@ -65,7 +65,12 @@ namespace Unusual_Timer
         private void StartTimer()
         {
             _isEnabled = true;
-            /*if (_progress == 0)*/ Timer_Elapsed(null, null);
+            if (_progress >= Duration.TotalMilliseconds)
+            {
+                App.Current.Dispatcher.Invoke(() => this.Reset());
+            }
+            /*if (_progress == 0)*/
+            Timer_Elapsed(null, null);
             _timer.Start();
         }
 

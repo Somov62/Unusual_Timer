@@ -4,9 +4,9 @@
     xmlns:converters="clr-namespace:Unusual_Timer.Converters"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
 
-    <SolidColorBrush x:Key="BackgroundWindow" Color="#0c7b82" />
-    <SolidColorBrush x:Key="ActiveTimerUnitColor" Color="#17a8c2" />
-    <SolidColorBrush x:Key="PassiveTimerUnitColor" Color="#1766c2" />
+    <SolidColorBrush x:Key="BackgroundWindow" Color="#1766c2" />
+    <SolidColorBrush x:Key="ActiveTimerUnitColor" Color="#FF00f2fe" />
+    <SolidColorBrush x:Key="PassiveTimerUnitColor" Color="#FF4facfe" />
 
     <converters:UnitSizeValueConverter x:Key="UnitSizeValueConverter" />
     <converters:RowDefenitionConverter x:Key="RowDefenitionConverter" />
@@ -16,7 +16,7 @@
         <Grid
             x:Name="border"
             Width="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Height}"
-            Height="{Binding ElementName=timerContainer, Path=ActualWidth, Converter={StaticResource UnitSizeValueConverter}, ConverterParameter=5}"
+            Height="{Binding ElementName=timerContainer, Path=ActualWidth, Converter={StaticResource UnitSizeValueConverter}, ConverterParameter={Binding CountUnitsInRow}}"
             Margin="-5,-2">
             <Border
                 x:Name="mask"

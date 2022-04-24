@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Unusual_Timer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:xct="Xceed.Wpf.Toolkit.Core.Primitives.DateTimeUpDownBase"
     x:Name="window"
     Title="MyTimer"
     Width="800"
@@ -22,27 +23,23 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0, 20, 0, 0">
+            
         <Button
-            MinWidth="150"
-            Margin="330,30,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Top"
-            Command="{Binding StartTimerCommand}"
-            Content="Start" />
-        <Button
-            MinWidth="150"
-            Margin="130,30,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
+            Margin="0, 0, 10, 0"
+            Style="{StaticResource UIPanelButton}"
             Command="{Binding ResetTimerCommand}"
             Content="Reset" />
         <Button
-            MinWidth="150"
-            Margin="0,30,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Top"
+            Style="{StaticResource UIPanelButton}"
             Command="{Binding StopTimerCommand}"
             Content="Stop" />
+            <Button
+            Margin="10, 0, 0, 0"
+            Style="{StaticResource UIPanelButton}"
+            Command="{Binding StartTimerCommand}"
+            Content="Start" />
+        </StackPanel>
 
         <ListView x:Name="timerContainer" Style="{StaticResource ListViewTimerStyle}" />
 

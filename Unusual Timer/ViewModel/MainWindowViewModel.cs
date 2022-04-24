@@ -36,7 +36,7 @@ namespace Unusual_Timer.ViewModel
             ResetTimerCommand = new LambdaCommand(OnResetTimerCommandExecuted, CanResetTimerCommandExecute);
             StopTimerCommand  = new LambdaCommand(OnStopTimerCommandExecuted, CanStopTimerCommandExecute);
 
-            _timer = new MyTimer(new TimeSpan(0, 0, 50));
+            _timer = new MyTimer(new TimeSpan(0, 0, 20));
         }
 
         public MyTimer Timer { get => _timer; }
