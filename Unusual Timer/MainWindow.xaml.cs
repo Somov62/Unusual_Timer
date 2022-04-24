@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Timers;
+using Unusual_Timer.ViewModel;
 
 namespace Unusual_Timer
 {
@@ -22,19 +23,12 @@ namespace Unusual_Timer
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MyTimer _timer;
-        public int MyProperty { get; set; }
+        private readonly MainWindowViewModel _viewModel;
         public MainWindow()
         {
             InitializeComponent();
-            _timer = new MyTimer();
-            _timer.Duration = new TimeSpan(0, 0, 18);
-            timerContainer.DataContext = _timer;
-        }
-
-        private void Start_Click(object sender, RoutedEventArgs e)
-        {
-            _timer.Start();
+            _viewModel = new MainWindowViewModel();
+            this.DataContext = _viewModel;
         }
 
     }

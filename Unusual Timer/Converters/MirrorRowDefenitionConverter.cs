@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Unusual_Timer
+namespace Unusual_Timer.Converters
 {
     public class MirrorRowDefenitionConverter : IValueConverter
     {
@@ -15,7 +15,7 @@ namespace Unusual_Timer
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

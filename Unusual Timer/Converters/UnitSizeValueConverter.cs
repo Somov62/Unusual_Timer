@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Unusual_Timer
+namespace Unusual_Timer.Converters
 {
     public class UnitSizeValueConverter : IValueConverter
     {
-       public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             int countInRow = 5;
             if (parameter != null)
             {
-                int.TryParse(parameter.ToString(), out countInRow);
+                if (!int.TryParse(parameter.ToString(), out countInRow))
+                    countInRow = 5;
                 if (countInRow < 1) countInRow = 5;
             }
             double height = (double)value;
@@ -24,7 +21,7 @@ namespace Unusual_Timer
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

@@ -11,17 +11,23 @@ namespace Unusual_Timer
 {
     public class TimerUnit : INotifyPropertyChanged
     {
-        private double _bindableTime;
-        private bool _isEnabled;
-        private double _duration;
         private Timer _timer;
+        private double _bindableTime;
+        private double _duration;
+        private bool _isEnabled;
+        private double _progress;
+        private double _millisecondIncrease;
 
-        public TimerUnit(double time = 1)
+        public TimerUnit(double duration)
         {
-            if (time < 1) time = 1;
-            Time = time;
+            Time = 1;
+            _timer = new Timer(20);
+            _timer.Elapsed += Timer_Elapsed;
+            _duration = duration;
+            Reset();
         }
 
+        #region Properties
         public double Duration
         {
             get => _duration;
@@ -31,13 +37,13 @@ namespace Unusual_Timer
                 this.Reset();
             }
         }
-
         public double Time
         {
             get => _bindableTime;
             set
             {
                 if (value < 0) value = 0;
+                if (value > 1) value = 1;
                 _bindableTime = value;
                 OnPropertyChanged("Time");
             }
@@ -47,10 +53,11 @@ namespace Unusual_Timer
             get => _isEnabled;
             set
             {
-                _isEnabled= value;
+                _isEnabled = value;
                 OnPropertyChanged("IsEnabled");
             }
         }
+        #endregion
 
         public void Start()
         {
@@ -60,36 +67,30 @@ namespace Unusual_Timer
             }
             Task.Run(StartTimer);
         }
-        private double progress;
-        private double millisecondIncrease;
 
         private void StartTimer()
         {
-            millisecondIncrease = 1 / Duration;
-            progress = 0;
-            _isEnabled = true;
-            _timer = new Timer();
-            _timer.Interval = 200;
-            _timer.Elapsed += Timer_Elapsed;
+            IsEnabled = true;
+            /*if (_progress == 0) */Timer_Elapsed(null, null);
             _timer.Start();
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (progress >= Duration)
+            if (_progress >= Duration)
             {
                 this.Stop();
                 return;
             }
-            progress += _timer.Interval;
+            _progress += _timer.Interval;
 
-            this.Time -= millisecondIncrease * _timer.Interval;
+            this.Time -= _millisecondIncrease * _timer.Interval;
         }
 
         public void Stop()
         {
             if (!_isEnabled) return;
-            _isEnabled = false;
+            IsEnabled = false;
             _timer.Stop();
         }
 
@@ -97,6 +98,8 @@ namespace Unusual_Timer
         {
             this.Stop();
             Time = 1;
+            _progress = 0;
+            _millisecondIncrease = 1 / Duration;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

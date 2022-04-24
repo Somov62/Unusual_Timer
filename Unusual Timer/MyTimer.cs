@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +16,19 @@ namespace Unusual_Timer
         private bool _isEnabled;
         private TimeSpan _duration;
         private Timer _timer;
-
-        public MyTimer()
+        private double _progress;
+        private double _unitDuration;
+        public MyTimer(TimeSpan duration)
         {
+            ListTimerUnits = new();
             CountUnitsInRow = 5;
+            Duration = duration;
+            _timer = new Timer();
+            _timer.Elapsed += Timer_Elapsed;
+            this.Reset();
         }
 
-
+        #region Properties
         public int CountUnitsInRow
         {
             get => _countUnitsInRow;
@@ -31,7 +39,7 @@ namespace Unusual_Timer
             }
         }
 
-        public List<TimerUnit> ListTimerUnits { get; private set; }
+        public ObservableCollection<TimerUnit> ListTimerUnits { get; private set; }
 
         public TimeSpan Duration
         {
@@ -43,6 +51,9 @@ namespace Unusual_Timer
             }
         }
 
+        public bool IsEnabled { get => _isEnabled; }
+        #endregion
+
         public void Start()
         {
             if (_isEnabled)
@@ -51,40 +62,31 @@ namespace Unusual_Timer
             }
             Task.Run(StartTimer);
         }
-        private double progress;
-        private double unitDuration;
-
         private void StartTimer()
         {
-            unitDuration = Duration.TotalMilliseconds / (CountUnitsInRow * 2 - 1);
-
             _isEnabled = true;
-            _timer = new Timer();
-            _timer.Interval = 1;
-            _timer.Elapsed += Timer_Elapsed;
+            /*if (_progress == 0)*/ Timer_Elapsed(null, null);
             _timer.Start();
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            _timer.Interval = unitDuration + 500;
-            if (progress >= Duration.TotalMilliseconds)
+            if (_progress >= Duration.TotalMilliseconds)
             {
                 this.Stop();
                 return;
             }
-            progress += _timer.Interval;
-            if (_units[0, 0].Time > 0)
+            _progress += _timer.Interval;
+            if (_units[0, 0].Time > 0 && !_units[0, 0].IsEnabled)
             {
                 for (int j = _units.GetLength(1) - 1; j >= 0; j--)
                 {
-                    if (_units[0, j].Time == 0) continue;
+                    if (_units[0, j].Time == 0 || _units[0, j].IsEnabled) continue;
 
                     try
                     {
                         for (int i = 0; i < _units.Length; i++)
                         {
-                            _units[i, j + i].Duration = unitDuration;
                             _units[i, j + i].Start();
                         }
                     }
@@ -96,13 +98,12 @@ namespace Unusual_Timer
 
             for (int i = 1; i < _units.GetLength(0); i++)
             {
-                if (_units[i, 0].Time == 0) continue;
+                if (_units[i, 0].Time == 0 || _units[i, 0].IsEnabled) continue;
 
                 try
                 {
                     for (int j = 0; j < _units.Length; j++)
                     {
-                        _units[i + j, j].Duration = unitDuration;
                         _units[i + j, j].Start();
                     }
                 }
@@ -114,13 +115,23 @@ namespace Unusual_Timer
         public void Stop()
         {
             if (!_isEnabled) return;
+
             _isEnabled = false;
             _timer.Stop();
+            foreach (var item in ListTimerUnits)
+            {
+                if (item.IsEnabled) item.Stop();
+            }
         }
 
         public void Reset()
         {
+            if (_timer == null) return;
             this.Stop();
+
+            _progress = 0;
+            _unitDuration = Duration.TotalMilliseconds / (CountUnitsInRow * 2 - 1);
+            _timer.Interval = _unitDuration;
 
             _units = new TimerUnit[CountUnitsInRow, CountUnitsInRow];
 
@@ -128,11 +139,11 @@ namespace Unusual_Timer
             {
                 for (int j = 0; j < _units.GetLength(1); j++)
                 {
-                    _units[i, j] = new TimerUnit();
+                    _units[i, j] = new TimerUnit(_unitDuration);
                 }
             }
 
-            ListTimerUnits = new();
+            ListTimerUnits.Clear();
             foreach (var item in _units)
             {
                 ListTimerUnits.Add(item);

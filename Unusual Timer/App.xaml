@@ -2,10 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Unusual_Timer"
+             xmlns:converters="clr-namespace:Unusual_Timer.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <local:WindowHeightConverter x:Key="aboba1"/>
+            <converters:WindowHeightConverter x:Key="WindowHeightConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
