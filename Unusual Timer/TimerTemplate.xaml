@@ -16,7 +16,7 @@
         <Grid
             x:Name="border"
             Width="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Height}"
-            Height="{Binding ElementName=timerContainer, Path=ActualWidth, Converter={StaticResource UnitSizeValueConverter}, ConverterParameter={Binding CountUnitsInRow}}"
+            Height="{Binding ElementName=timerContainer, Path=ActualWidth, Converter={StaticResource UnitSizeValueConverter}, ConverterParameter=5}"
             Margin="-5,-2">
             <Border
                 x:Name="mask"
